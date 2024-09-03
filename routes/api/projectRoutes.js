@@ -5,6 +5,14 @@ const sequelize = require("sequelize");
 const connection = require("../../config/connection")
 const { validateToken, findUserByEmail, validateRequest } = require("../../controllers/authController");
 
+const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
+
+const utf8Encode = {
+    encode: (content) => Array.from(textEncoder.encode(content)),
+    decode: (content) => textDecoder.decode(new Uint8Array(content)) // Use TextDecoder and convert array back to Uint8Array
+};
+
 router.get("/:userId", async (req, res) => {
     let user = null;
     try{
@@ -19,6 +27,16 @@ router.get("/:userId", async (req, res) => {
             ownerId: req.params.userId
         }
     })
+    for (let project of projects){
+        const files = await File.findAll({
+            where: {"project": project.ID}
+        });
+        console.log(files);
+        for (let file of files){
+            file.content = utf8Encode.decode(file.content);
+        }
+        project.dataValues.files = files;
+    }
     return res.status(200).json(projects);
 })
 router.get("/:userId/:projectId", async (req, res) => {
@@ -37,6 +55,14 @@ router.get("/:userId/:projectId", async (req, res) => {
             ownerId: req.params.userId
         }
     })
+    const files = await File.findAll({
+        where: {"project": project.ID}
+    });
+    console.log(files);
+    for (let file of files){
+        file.content = utf8Encode.decode(file.content);
+    }
+    project.dataValues.files = files;
     return res.status(200).json(project);
 })
 router.post("/", async (req, res) => {
