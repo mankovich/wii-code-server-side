@@ -2,11 +2,16 @@ const router = require("express").Router();
 const express = require('express');
 const { Project, File } = require('../../models');
 const sequelize = require("sequelize");
-
-
+const connection = require("../../config/connection")
+const { validateToken, findUserByEmail, validateRequest } = require("../../controllers/authController");
 
 router.get("/:userId", async (req, res) => {
-    //VERIFY TOKEN
+    let user = null;
+    try{
+        user = await validateRequest(req, res);
+    } catch {
+        return res.status(401).json({error: "Invalid token!"});
+    }
     console.log("Recieved request to read all projects");
     console.log("For user ", req.params.userId);
     const projects = await Project.findAll({
@@ -17,7 +22,12 @@ router.get("/:userId", async (req, res) => {
     return res.status(200).json(projects);
 })
 router.get("/:userId/:projectId", async (req, res) => {
-    //VERIFY TOKEN
+    let user = null;
+    try{
+        user = await validateRequest(req, res);
+    } catch {
+        return res.status(401).json({error: "Invalid token!"});
+    }
     console.log("Recieved request to read one project");
     console.log("For user ", req.params.userId);
     console.log("For project ", req.params.projectId);
@@ -30,13 +40,20 @@ router.get("/:userId/:projectId", async (req, res) => {
     return res.status(200).json(project);
 })
 router.post("/", async (req, res) => {
-    //VERIFY TOKEN
+    let user = null;
+    try{
+        user = await validateRequest(req, res);
+    } catch {
+        return res.status(401).json({error: "Invalid token!"});
+    }
     console.log("Recieved request to create a project");
     const requestData = req.body;
     const projectJson = requestData.project;
+    console.log("For user with ID:" + user.ID);
+    projectJson.ownerId = user.ID;
     const fileData = requestData.files;
     //Start an acid transaction so we don't leave the db in a undefined state
-    const t = await sequelize.transaction();
+    const t = await connection.transaction();
     let utf8Encode = new TextEncoder();
     try {
         const project = await Project.create(projectJson, { transaction: t});
@@ -55,11 +72,16 @@ router.post("/", async (req, res) => {
     } catch (error){
         //we failed, lets roll back
         await t.rollback();
-        res.status(500).json({error: error});
+        return res.status(500).json({error: error});
     }
 });
 router.delete("/:projectId", async (req, res) => {
-    //VERIFY TOKEN
+    let user = null;
+    try{
+        user = await validateRequest(req, res);
+    } catch {
+        return res.status(401).json({error: "Invalid token!"});
+    }
     console.log("Recieved request to delete a project");
     const numDeleted = await Project.destroy({
         where: {
@@ -67,9 +89,9 @@ router.delete("/:projectId", async (req, res) => {
         }
     });
     if ( numDeleted ){
-        res.status(200).json({message: "Sucessfully deleted project"})
+        return res.status(200).json({message: "Sucessfully deleted project"})
     } else {
-        res.status(404).json({error: "Couldn't find project!"})
+        return res.status(404).json({error: "Couldn't find project!"})
     }
 });
 

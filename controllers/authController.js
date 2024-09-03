@@ -38,18 +38,32 @@ const newToken = ({ id, email }) => {
 }
 
 const findUserByEmail = async (email) => {
-
+    console.log("Reading user by email: " + email);
     const foundUser = await User.findOne({
         where: {
-            email,
+            email: email,
         },
     });
+    console.log("found user: " + JSON.stringify(foundUser));
     return foundUser;
-      
 };
+
+const validateRequest = async (req, res) => {
+    const token = req.headers.authorization;
+    try {
+        const tokenData = validateToken(token);
+        const email = tokenData.email;
+        const user = await findUserByEmail(email);
+        return user;
+    } catch {
+        console.log("Could not validate token!");
+        throw new Error("Failed validation")
+    }
+}
 module.exports = {
     validateToken,
     createNewUser,
     newToken,
     findUserByEmail,
+    validateRequest
 }
