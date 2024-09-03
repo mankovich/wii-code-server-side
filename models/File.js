@@ -18,14 +18,14 @@ const File = sequelize.define('File', {
     },
     lastUpdated: {
         type: 'TIMESTAMP',
-        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP'),
+        defaultValue: DataTypes.NOW,
         allowNull: false
     },
     project: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: "UserObj",
+            model: "Project",
             key: 'ID'
         }
     }

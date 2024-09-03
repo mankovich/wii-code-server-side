@@ -10,7 +10,6 @@ const Project = sequelize.define('Project', {
     },
     ownerId: {
         type: DataTypes.INTEGER,
-        autoIncrement: true,
         references: {
             model: "UserObj",
             key: "ID"
@@ -22,7 +21,7 @@ const Project = sequelize.define('Project', {
     },
     lastUpdated: {
         type: 'TIMESTAMP',
-        defaultValue: DataTypes.literal('CURRENT_TIMESTAMP'),
+        defaultValue: DataTypes.NOW,
         allowNull: false
     },
     directory: {
