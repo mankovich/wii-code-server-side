@@ -80,12 +80,12 @@ router.post("/", async (req, res) => {
     const fileData = requestData.files;
     //Start an acid transaction so we don't leave the db in a undefined state
     const t = await connection.transaction();
-    let utf8Encode = new TextEncoder();
     try {
         const project = await Project.create(projectJson, { transaction: t});
         const files = [];
         if (fileData){
             for (const file of fileData){
+                file.project = project.ID
                 file.content = utf8Encode.encode(file.content);
                 const rereadFile = await File.create(file, {transaction: t});
                 rereadFile.content = utf8Encode.decode(rereadFile.content);
@@ -98,7 +98,7 @@ router.post("/", async (req, res) => {
     } catch (error){
         //we failed, lets roll back
         await t.rollback();
-        return res.status(500).json({error: error});
+        return res.status(500).json({error: error.message});
     }
 });
 router.delete("/:projectId", async (req, res) => {
