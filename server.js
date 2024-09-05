@@ -1,12 +1,12 @@
 const express = require("express");
 const allRoutes = require("./routes")
-// const cors = require("cors");
+const cors = require("cors");
 const sequelize = require("./config/connection");
 const url = require('url');
 const { File } = require('./models')
 
 const app = express();
-// app.use(cors());
+app.use(cors());
 const PORT = process.env.PORT || 3001;
 
 // const { User } = require("./models");

@@ -55,14 +55,15 @@ router.get("/:userId/:projectId", async (req, res) => {
             ownerId: req.params.userId
         }
     })
+    console.log(project);
     const files = await File.findAll({
-        where: {"project": project.ID}
+        where: {"project": project[0].dataValues.ID}
     });
-    console.log(files);
+    // console.log(files);
     for (let file of files){
         file.content = utf8Encode.decode(file.content);
     }
-    project.dataValues.files = files;
+    project[0].dataValues.files = files;
     return res.status(200).json(project);
 })
 router.post("/", async (req, res) => {
