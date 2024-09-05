@@ -22,6 +22,8 @@ router.post("/", async (req, res) => {
     }
     //check that its not a duplicate name
     const file = req.body;
+    console.log("Adding file of:");
+    console.log(file);
     const projectFiles = await File.findAll({
         where: {project: file.project}
     })
