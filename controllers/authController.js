@@ -50,6 +50,8 @@ const findUserByEmail = async (email) => {
 
 const validateRequest = async (req, res) => {
     const token = req.headers.authorization;
+    console.log("Validating request headers of: ");
+    console.log(req.headers);
     try {
         const tokenData = validateToken(token);
         const email = tokenData.email;
