@@ -42,7 +42,7 @@ router.post("/login", async (req, res) => {
 
 router.get("/profile", (req, res) => {
 
-  const token = req.headers.authorization?.split(" ")[1];
+  const token = req.headers.authorization;
   try {
     console.log({ token });
     const tokenData = validateToken(token);
