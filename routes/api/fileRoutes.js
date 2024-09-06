@@ -55,11 +55,11 @@ router.delete("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
     //Add check that this is the users file
     let user = null;
-    try{
-        user = await validateRequest(req, res);
-    } catch {
-        return res.status(401).json({error: "Invalid token!"});
-    }
+    // try{
+    //     user = await validateRequest(req, res);
+    // } catch {
+    //     return res.status(401).json({error: "Invalid token!"});
+    // }
     const id = req.params.id;
     const updateJson = req.body;
     if ("content" in updateJson){
