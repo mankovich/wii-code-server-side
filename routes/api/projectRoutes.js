@@ -110,11 +110,19 @@ router.delete("/:projectId", async (req, res) => {
         return res.status(401).json({error: "Invalid token!"});
     }
     console.log("Recieved request to delete a project");
+    const filesDeleted = await File.destroy({
+      where: {
+          "project": req.params.projectId
+      }
+  });
+
+    console.log("Deleted " + filesDeleted + " files from project " + req.params.projectId);
     const numDeleted = await Project.destroy({
         where: {
             ID: req.params.projectId
         }
     });
+    console.log("Deleted " + numDeleted + " project associated with project id " + req.params.projectId);
     if ( numDeleted ){
         return res.status(200).json({message: "Sucessfully deleted project"})
     } else {
